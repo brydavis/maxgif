@@ -1,4 +1,4 @@
-# Gif American Style
+# GIF American Style
 
 ```go
 package main
