@@ -5,25 +5,28 @@ import (
 	"fmt"
 	"image"
 	"image/gif"
-	"image/jpeg"
 	"io/ioutil"
 	"os"
 	"path"
+
+	rs "github.com/brydavis/resize" // "../resize"
 )
 
 func main() {
-
 	dir, _ := ioutil.ReadDir(".")
 
 	var imgs []*image.Paletted
-
 	for _, file := range dir {
-		switch ext := path.Ext(file.Name()); ext {
-		case ".jpg", ".jpeg":
-			f, _ := os.Open(file.Name())
-			defer f.Close()
+		f, _ := os.Open(file.Name())
+		defer f.Close()
 
-			img, _ := jpeg.Decode(f)
+		if ext := path.Ext(file.Name()); ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
+			fmt.Printf("File not an image: %s\n", file.Name())
+		} else {
+			img, err := rs.ResizePixels(f, 400, 400)
+			if err != nil {
+				fmt.Println(err)
+			}
 
 			var opt gif.Options
 			opt.NumColors = 256
@@ -32,31 +35,7 @@ func main() {
 			gif.Encode(buf, img, &opt)
 
 			g, _ := gif.DecodeAll(buf)
-
-			pic := g.Image[0]
-			size := pic.Rect.Size()
-			fmt.Printf("%s %v\n", file.Name(), size)
-
-			// rect:= image.Rect(0, 0, 500, 500)
-			rx, ry := 0, 0
-
-			for x := 0; x < pic.Rect.Max.X; x++ {
-
-				for y := 0; y < pic.Rect.Max.X; y++ {
-
-					if y%2 != 0.0 && x%2 != 0.0 {
-
-						pic.Set(rx, ry, pic.At(x, y))
-						rx++
-						ry++
-					}
-
-				}
-			}
-			imgs = append(imgs, pic)
-
-		default:
-			fmt.Println(ext)
+			imgs = append(imgs, g.Image[0])
 		}
 	}
 
