@@ -20,7 +20,7 @@ func main() {
 		f, _ := os.Open(file.Name())
 		defer f.Close()
 
-		if ext := path.Ext(file.Name()); ext != ".jpg" && ext != ".jpeg" && ext != ".png" {
+		if ext := path.Ext(file.Name()); ext != ".jpg" && ext != ".JPG" && ext != ".jpeg" && ext != ".png" {
 			fmt.Printf("File not an image: %s\n", file.Name())
 		} else {
 			img, err := rs.ResizePixels(f, 400, 400)
